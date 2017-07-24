@@ -16,8 +16,10 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from main.views import *
+from sardash.views import HomeView
 
 urlpatterns = [
+    url(r'^$', HomeView.as_view(), name='home'),
     url(r'^admin/', admin.site.urls),
     url(r'^cpu/$', get_sar_cpu, name="get_sar_cpu"),
 ]
