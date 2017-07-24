@@ -3,70 +3,11 @@
 SAR CPU
 {% endblock %}
 {% block contents %}
-<h2>CPU</h2>
-<svg width="960" height="500"></svg>
-<script>
-var svg = d3.select("svg"),
-    margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom,
-    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-var parseTime = d3.timeParse("%I:%M:%S%p");
-
-var x = d3.scaleTime().rangeRound([0, width]);
-var y = d3.scaleLinear().rangeRound([height, 0]);
-
-var xAxis = d3.axisBottom(x);
-var yAxis = d3.axisLeft(x);
-
-var valueline = d3.line()
-    .x(function(d) {return x(d.date); })
-    .y(function(d) {return y(d.close); });
-
-var svg = d3.select("body")
-    .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-        .attr("transform", 
-              "translate(" + margin.left + "," + margin.top + ")");
-
-d3.json("{% url 'get_sar_cpu' %}", function(error, data) {
-    data.forEach(function(d) {
-        d.date = parseTime(d[0].concat(d[1]));
-        d.close = +d[3];
-    });
-
-    // Scale the range of the data
-    x.domain(d3.extent(data, function(d) { return d.date; }));
-    y.domain(d3.extent(data, function(d) { return d.close; }));
-
-  g.append("g")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x))
-    .select(".domain")
-      .remove();
-
-  g.append("g")
-      .call(d3.axisLeft(y))
-    .append("text")
-      .attr("fill", "#000")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", "0.71em")
-      .attr("text-anchor", "end")
-      .text("user(%)");
-
-  g.append("path")
-      .datum(data)
-      .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-linejoin", "round")
-      .attr("stroke-linecap", "round")
-      .attr("stroke-width", 1.5)
-      .attr("d", valueline);
-});
-</script>
+<div class="flex-container">
+    <div class="svg-box">
+        <h2>CPU</h2>
+        {% include "cpu.html" %}
+    </div>
+</div>
 
 {% endblock %}
