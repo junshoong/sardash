@@ -17,11 +17,14 @@ def _get_sar_cpu():
         data['body'] = raw_data[5:-1]
         data['avg'] = raw_data[-1]
 
+        row = []
+        for x in data['body']:
+            row.append(x.split())
+
     except Exception as err:
         data = str(err)
 
-    print(data)
-    return data
+    return row
     
 
 def get_sar_cpu(request):
@@ -29,7 +32,7 @@ def get_sar_cpu(request):
         data = _get_sar_cpu()
     except Exception:
         data = None
-    data = json.dumps(data['body'])
+    data = json.dumps(data)
     response = HttpResponse()
     response['Content-Type'] = 'text/javascript'
     response.write(data)
