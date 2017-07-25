@@ -1,4 +1,7 @@
-from django import forms
+from django.forms import ModelForm
+from main.models import Server
 
-class IPForm(forms.Form):
-    address = forms.GenericIPAddressField(protocol='IPv4')
+class IPForm(ModelForm):
+    class Meta:
+        model = Server
+        fields = ['ip']

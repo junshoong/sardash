@@ -5,7 +5,11 @@ SAR CPU
 {% block contents %}
 <form action="." method="post">
     {% csrf_token %}
-    {{ form }}
+    <select name="ip">
+        {% for s in server %}
+        <option value="{{ s.ip }}">{{ s.ip }}</option>
+        {% endfor %}
+    </select>
     <input type="submit" value="Submit" />
 </form>
 <h1>{{ ip }}</h1>
