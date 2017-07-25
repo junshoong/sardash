@@ -3,6 +3,11 @@
 SAR CPU
 {% endblock %}
 {% block contents %}
+<form action="." method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit" />
+</form>
 <h1>{{ ip }}</h1>
 <div class="flex-container">
     <div class="svg-box">
