@@ -16,6 +16,8 @@ class HomeView(FormView):
         return context
 
     def form_valid(self, form):
+        ip = self.request.POST['ip']
+        form.get_remote_sar_data(ip)
         return super(HomeView, self).form_valid(form)
 
     def get_success_url(self):

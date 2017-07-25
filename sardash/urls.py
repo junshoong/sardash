@@ -15,7 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from main.views import *
+from main.views import get_sar_cpu
+from main.views import get_sar_mem
 from sardash.views import HomeView
 
 urlpatterns = [

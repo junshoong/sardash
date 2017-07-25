@@ -1,6 +1,7 @@
 import os
 import json
 import errno
+import subprocess
 
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -14,7 +15,7 @@ def _get_sar_cpu(ip):
         if ip is None:
             command = os.popen("sar")
         else:
-            command = os.popen("sar -f /tmp/"+ip+"/sa*")
+            command = os.popen("sar -f /tmp/"+ip+"/sa25")
         raw_data = command.read().strip().split('\n')
         data = dict()
         data['info']= raw_data[0]
@@ -38,7 +39,7 @@ def _get_sar_mem(ip):
         if ip is None:
             command = os.popen("sar -r")
         else:
-            command = os.popen("sar -r -f /tmp/"+ip+"/sa*")
+            command = os.popen("sar -r -f /tmp/"+ip+"/sa25")
         raw_data = command.read().strip().split('\n')
         data = dict()
         data['info']= raw_data[0]
@@ -81,20 +82,16 @@ def get_sar_cpu(request, ip=None):
 
     return response
 
-def _get_remote_sar(ip):
+def get_remote_sar(ip):
+    print('here is view', ip)
     try:
         full_path = '/tmp/'+ip
+        print('mkdir', full_path)
         os.makedirs(full_path)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise 
 
+    print('run scp')
     subprocess.run(['scp', 'root@'+ip+':/var/log/sysstat/*',full_path])
     
-
-def get_remote_sar(request):
-    form = IPForm(request.POST or None)
-    if form.is_valid():
-        return redirect('home')
-    return render(request, 'main.html', {'form': form})
-
