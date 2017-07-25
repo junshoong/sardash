@@ -22,4 +22,5 @@ urlpatterns = [
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^admin/', admin.site.urls),
     url(r'^cpu/$', get_sar_cpu, name="get_sar_cpu"),
+    url(r'^mem/$', get_sar_mem, name="get_sar_mem"),
 ]

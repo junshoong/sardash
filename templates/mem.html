@@ -1,10 +1,10 @@
-<svg class="cpu" width="500" height="300"></svg>
+<svg class="mem" width="500" height="300"></svg>
 <script>
-var cpu_svg = d3.select(".cpu"),
+var mem_svg = d3.select(".mem"),
     margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = +cpu_svg.attr("width") - margin.left - margin.right,
-    height = +cpu_svg.attr("height") - margin.top - margin.bottom,
-    cpu_g = cpu_svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    width = +mem_svg.attr("width") - margin.left - margin.right,
+    height = +mem_svg.attr("height") - margin.top - margin.bottom,
+    mem_g = mem_svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var parseTime = d3.timeParse("%I:%M:%S%p");
 
@@ -15,23 +15,23 @@ var valueline = d3.line()
     .x(function(d) {return x(d.date); })
     .y(function(d) {return y(d.close); });
 
-d3.json("{% url 'get_sar_cpu' %}", function(error, data) {
+d3.json("{% url 'get_sar_mem' %}", function(error, data) {
     data.forEach(function(d) {
         d.date = parseTime(d[0].concat(d[1]));
-        d.close = +d[3];
+        d.close = +d[4];
     });
 
     x.domain(d3.extent(data, function(d) { return d.date; }));
     y.domain([0,100]);
 
 
-  cpu_g.append("g")
+  mem_g.append("g")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x))
-    .select(".cpu .domain")
+    .select(".mem .domain")
       .remove();
 
-  cpu_g.append("g")
+  mem_g.append("g")
       .call(d3.axisLeft(y))
     .append("text")
       .attr("fill", "#000")
@@ -41,7 +41,7 @@ d3.json("{% url 'get_sar_cpu' %}", function(error, data) {
       .attr("text-anchor", "end")
       .text("user(%)");
 
-  cpu_g.append("path")
+  mem_g.append("path")
       .datum(data)
       .attr("fill", "none")
       .attr("stroke", "steelblue")
