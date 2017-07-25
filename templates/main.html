@@ -3,14 +3,15 @@
 SAR CPU
 {% endblock %}
 {% block contents %}
+<h1>{{ ip }}</h1>
 <div class="flex-container">
     <div class="svg-box">
         <h2>CPU</h2>
-        {% include "cpu.html" %}
+        {% include "cpu.html" with ip=ip %}
     </div>
     <div class="svg-box">
         <h2>Memory</h2>
-        {% include "mem.html" %}
+        {% include "mem.html" with ip=ip %}
     </div>
 </div>
 

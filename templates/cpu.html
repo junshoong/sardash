@@ -15,7 +15,7 @@ var valueline = d3.line()
     .x(function(d) {return x(d.date); })
     .y(function(d) {return y(d.close); });
 
-d3.json("{% url 'get_sar_cpu' %}", function(error, data) {
+d3.json("{% url 'get_sar_cpu' %}{% if ip %}{{ ip }}/{% endif %}", function(error, data) {
     data.forEach(function(d) {
         d.date = parseTime(d[0].concat(d[1]));
         d.close = +d[3];

@@ -1,14 +1,20 @@
 import os
 import json
+import errno
 
 from django.http import HttpResponse
 from django.shortcuts import render
 
+from main.forms import IPForm
+
 # Create your views here.
 
-def _get_sar_cpu():
+def _get_sar_cpu(ip):
     try:
-        command = os.popen("sar")
+        if ip is None:
+            command = os.popen("sar")
+        else:
+            command = os.popen("sar -f /tmp/"+ip+"/sa*")
         raw_data = command.read().strip().split('\n')
         data = dict()
         data['info']= raw_data[0]
@@ -27,9 +33,12 @@ def _get_sar_cpu():
     return row
 
 
-def _get_sar_mem():
+def _get_sar_mem(ip):
     try:
-        command = os.popen("sar -r")
+        if ip is None:
+            command = os.popen("sar -r")
+        else:
+            command = os.popen("sar -r -f /tmp/"+ip+"/sa*")
         raw_data = command.read().strip().split('\n')
         data = dict()
         data['info']= raw_data[0]
@@ -47,9 +56,9 @@ def _get_sar_mem():
 
     return row
 
-def get_sar_mem(request):
+def get_sar_mem(request, ip=None):
     try:
-        data = _get_sar_mem()
+        data = _get_sar_mem(ip)
     except Exception:
         data = None
     data = json.dumps(data)
@@ -60,9 +69,9 @@ def get_sar_mem(request):
     return response
     
 
-def get_sar_cpu(request):
+def get_sar_cpu(request, ip=None):
     try:
-        data = _get_sar_cpu()
+        data = _get_sar_cpu(ip)
     except Exception:
         data = None
     data = json.dumps(data)
@@ -71,3 +80,21 @@ def get_sar_cpu(request):
     response.write(data)
 
     return response
+
+def _get_remote_sar(ip):
+    try:
+        full_path = '/tmp/'+ip
+        os.makedirs(full_path)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise 
+
+    subprocess.run(['scp', 'root@'+ip+':/var/log/sysstat/*',full_path])
+    
+
+def get_remote_sar(request):
+    form = IPForm(request.POST or None)
+    if form.is_valid():
+        return redirect('home')
+    return render(request, 'main.html', {'form': form})
+

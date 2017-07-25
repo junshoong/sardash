@@ -19,8 +19,11 @@ from main.views import *
 from sardash.views import HomeView
 
 urlpatterns = [
+    url(r'^(?P<ip>((2[0-5]|1[0-9]|[0-9])?[0-9]\.){3}((2[0-5]|1[0-9]|[0-9])?[0-9]))/$', HomeView.as_view(), name='home'),
     url(r'^$', HomeView.as_view(), name='home'),
     url(r'^admin/', admin.site.urls),
+    url(r'^cpu/(?P<ip>((2[0-5]|1[0-9]|[0-9])?[0-9]\.){3}((2[0-5]|1[0-9]|[0-9])?[0-9]))/$', get_sar_cpu, name="get_sar_cpu"),
     url(r'^cpu/$', get_sar_cpu, name="get_sar_cpu"),
+    url(r'^mem/(?P<ip>((2[0-5]|1[0-9]|[0-9])?[0-9]\.){3}((2[0-5]|1[0-9]|[0-9])?[0-9]))/$', get_sar_mem, name="get_sar_mem"),
     url(r'^mem/$', get_sar_mem, name="get_sar_mem"),
 ]
