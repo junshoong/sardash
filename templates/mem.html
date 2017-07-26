@@ -19,7 +19,7 @@ var line = d3.line()
     .x(function(d, i) {return x(times[i]); })
     .y(y);
 
-d3.json("{% url 'get_sar_mem' %}{% if ip %}{{ ip }}/{% endif %}", function(error, data) {
+    d3.json("{% if ip %}{% url 'get_sar_mem' ip %}{% else %}{% url 'get_sar_mem' %}{% endif %}", function(error, data) {
     
     data.forEach(function(d) {
         times.push(parseTime(d[0].concat(d[1])));
