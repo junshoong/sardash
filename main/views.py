@@ -7,8 +7,10 @@ from datetime import datetime
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.dateformat import DateFormat
+from django.http import HttpResponse
 
 from main.forms import IPForm
+from sardash.settings import SA_ROOT
 
 TODAY = DateFormat(datetime.now()).format('d')
 
@@ -18,7 +20,7 @@ def _get_sar_cpu(ip):
         if ip is None:
             command = os.popen("sar")
         else:
-            command = os.popen("sar -f /tmp/"+ip+"/sa"+TODAY)
+            command = os.popen("sar -f "+SA_ROOT+ ip+"/sa"+TODAY)
         raw_data = command.read().strip().split('\n')
         data = dict()
         data['info']= raw_data[0]
@@ -42,7 +44,7 @@ def _get_sar_mem(ip):
         if ip is None:
             command = os.popen("sar -r")
         else:
-            command = os.popen("sar -r -f /tmp/"+ip+"/sa"+TODAY)
+            command = os.popen("sar -r -f "+SA_ROOT+ip+"/sa"+TODAY)
         raw_data = command.read().strip().split('\n')
         data = dict()
         data['info']= raw_data[0]
@@ -66,7 +68,7 @@ def _get_sar_paging(ip):
         if ip is None:
             command = os.popen("sar -B")
         else:
-            command = os.popen("sar -B -f /tmp/"+ip+"/sa"+TODAY)
+            command = os.popen("sar -B -f "+SA_ROOT+ip+"/sa"+TODAY)
         raw_data = command.read().strip().split('\n')
         data = dict()
         data['info']= raw_data[0]
@@ -127,7 +129,7 @@ def get_sar_cpu(request, ip=None):
 def get_remote_sar(ip):
     print('here is view', ip)
     try:
-        full_path = '/tmp/'+ip
+        full_path = SA_ROOT+ip
         print('mkdir', full_path)
         os.makedirs(full_path)
     except OSError as e:

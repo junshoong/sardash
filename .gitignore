@@ -103,3 +103,7 @@ ENV/
 
 #db
 db.sqlite3
+
+
+#sar file
+sa/
