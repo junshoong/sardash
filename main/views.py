@@ -6,6 +6,7 @@ from datetime import datetime
 
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.shortcuts import render_to_response
 from django.utils.dateformat import DateFormat
 from django.http import HttpResponse
 
@@ -141,3 +142,21 @@ def get_remote_sar(ip):
     if cp.returncode != 0:
         subprocess.run(['scp', 'root@'+ip+':/var/log/sa/sa'+TODAY,full_path])
     
+
+def download_sa(request, ip, file_name):
+    file_path = os.path.join(SA_ROOT, ip, file_name)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type='application/octet-stream')
+            response['Content-Disposion'] = 'inline; filename='+ os.path.basename(file_path)
+            return response
+
+    raise Http404
+
+
+def file_list(request, ip=None):
+    if ip:
+        files = os.listdir(SA_ROOT+ip)
+    else:
+        files = os.listdir(SA_ROOT)
+    return render_to_response('file_list.html', {'files': files})
