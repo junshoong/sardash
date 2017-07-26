@@ -2,20 +2,23 @@ import os
 import json
 import errno
 import subprocess
+from datetime import datetime
 
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.utils.dateformat import DateFormat
 
 from main.forms import IPForm
 
-# Create your views here.
+TODAY = DateFormat(datetime.now()).format('d')
+
 
 def _get_sar_cpu(ip):
     try:
         if ip is None:
             command = os.popen("sar")
         else:
-            command = os.popen("sar -f /tmp/"+ip+"/sa25")
+            command = os.popen("sar -f /tmp/"+ip+"/sa"+TODAY)
         raw_data = command.read().strip().split('\n')
         data = dict()
         data['info']= raw_data[0]
@@ -39,7 +42,7 @@ def _get_sar_mem(ip):
         if ip is None:
             command = os.popen("sar -r")
         else:
-            command = os.popen("sar -r -f /tmp/"+ip+"/sa25")
+            command = os.popen("sar -r -f /tmp/"+ip+"/sa"+TODAY)
         raw_data = command.read().strip().split('\n')
         data = dict()
         data['info']= raw_data[0]
@@ -82,6 +85,7 @@ def get_sar_cpu(request, ip=None):
 
     return response
 
+
 def get_remote_sar(ip):
     print('here is view', ip)
     try:
@@ -93,5 +97,5 @@ def get_remote_sar(ip):
             raise 
 
     print('run scp')
-    subprocess.run(['scp', 'root@'+ip+':/var/log/sysstat/*',full_path])
+    subprocess.run(['scp', 'root@'+ip+':/var/log/sysstat/sa'+TODAY,full_path])
     
