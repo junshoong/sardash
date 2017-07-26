@@ -135,5 +135,7 @@ def get_remote_sar(ip):
             raise 
 
     print('run scp')
-    subprocess.run(['scp', 'root@'+ip+':/var/log/sysstat/sa'+TODAY,full_path])
+    cp = subprocess.run(['scp', 'root@'+ip+':/var/log/sysstat/sa'+TODAY,full_path])
+    if cp.returncode != 0:
+        subprocess.run(['scp', 'root@'+ip+':/var/log/sa/sa'+TODAY,full_path])
     
