@@ -4,119 +4,43 @@ import errno
 import subprocess
 from datetime import datetime
 
-from django.shortcuts import render
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.http import Http404
 from django.utils.dateformat import DateFormat
 
-from main.forms import IPForm
 from sardash.settings import SA_ROOT
 
 TODAY = DateFormat(datetime.now()).format('d')
 
 
-def _get_sar_cpu(ip):
+def command_sar(ip, resource, date):
     try:
-        if ip is None:
-            command = os.popen("sar")
+        if resource == 'cpu':
+            option = '-u'
+        elif resource == 'memory':
+            option = '-r'
+        elif resource == 'paging':
+            option = '-B'
         else:
-            command = os.popen("sar -f "+SA_ROOT+ ip+"/sa"+TODAY)
-        raw_data = command.read().strip().split('\n')
-        data = dict()
-        data['info']= raw_data[0]
-        data['start'] = raw_data[2]
-        data['header'] = raw_data[4]
-        data['body'] = raw_data[5:-1]
-        data['avg'] = raw_data[-1]
+            option = ''
 
+        command = os.popen("sar "+option+" -f "+SA_ROOT+ip+"/sa"+date)
+        raw_data = command.read().strip().split('\n')
+        data = raw_data[5:-1]
         row = []
-        for x in data['body']:
+        for x in data:
             row.append(x.split())
 
     except Exception as err:
-        data = str(err)
+        row = str(err)
 
     return row
 
 
-def _get_sar_mem(ip):
+def get_sar_data(request, ip='127.0.0.1', resource='cpu', date=TODAY):
     try:
-        if ip is None:
-            command = os.popen("sar -r")
-        else:
-            command = os.popen("sar -r -f "+SA_ROOT+ip+"/sa"+TODAY)
-        raw_data = command.read().strip().split('\n')
-        data = dict()
-        data['info']= raw_data[0]
-        data['start'] = raw_data[2]
-        data['header'] = raw_data[4]
-        data['body'] = raw_data[5:-1]
-        data['avg'] = raw_data[-1]
-
-        row = []
-        for x in data['body']:
-            row.append(x.split())
-
-    except Exception as err:
-        data = str(err)
-
-    return row
-
-
-def _get_sar_paging(ip):
-    try:
-        if ip is None:
-            command = os.popen("sar -B")
-        else:
-            command = os.popen("sar -B -f "+SA_ROOT+ip+"/sa"+TODAY)
-        raw_data = command.read().strip().split('\n')
-        data = dict()
-        data['info']= raw_data[0]
-        data['start'] = raw_data[2]
-        data['header'] = raw_data[4]
-        data['body'] = raw_data[5:-1]
-        data['avg'] = raw_data[-1]
-
-        row = []
-        for x in data['body']:
-            row.append(x.split())
-
-    except Exception as err:
-        data = str(err)
-
-    return row
-
-
-def get_sar_paging(request, ip='127.0.0.1'):
-    try:
-        data = _get_sar_paging(ip)
-    except Exception:
-        data = None
-    data = json.dumps(data)
-    response = HttpResponse()
-    response['Content-Type'] = 'text/javascript'
-    response.write(data)
-
-    return response
-    
-
-def get_sar_mem(request, ip='127.0.0.1'):
-    try:
-        data = _get_sar_mem(ip)
-    except Exception:
-        data = None
-    data = json.dumps(data)
-    response = HttpResponse()
-    response['Content-Type'] = 'text/javascript'
-    response.write(data)
-
-    return response
-    
-
-def get_sar_cpu(request, ip='127.0.0.1'):
-    try:
-        data = _get_sar_cpu(ip)
+        data = command_sar(ip, resource, date)
     except Exception:
         data = None
     data = json.dumps(data)

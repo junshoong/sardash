@@ -15,9 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from main.views import get_sar_cpu
-from main.views import get_sar_mem
-from main.views import get_sar_paging
+from main.views import get_sar_data
 from main.views import download
 from main.views import file_list
 from sardash.views import HomeView
@@ -27,15 +25,9 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     
     url(r'^$', HomeView.as_view(), name='home'),
-    # url(r'^cpu/$', get_sar_cpu, name="get_sar_cpu"),
-    # url(r'^mem/$', get_sar_mem, name="get_sar_mem"),
-    # url(r'^paging/$', get_sar_paging, name="get_sar_paging"),
-    # url(r'^list/$', file_list, name="file_list"),
 
     url(r'^{}/$'.format(ip_regex), HomeView.as_view(), name='home'),
-    url(r'^{}/cpu/$'.format(ip_regex), get_sar_cpu, name="get_sar_cpu"),
-    url(r'^{}/mem/$'.format(ip_regex), get_sar_mem, name="get_sar_mem"),
-    url(r'^{}/paging/$'.format(ip_regex), get_sar_paging, name="get_sar_paging"),
+    url(r'^{}/(?P<resource>cpu|memory|paging)/$'.format(ip_regex), get_sar_data, name="get_sar_data"),
     url(r'^{}/list/$'.format(ip_regex), file_list, name="file_list"),
     url(r'^{}/(?P<file_name>sa\d+)/$'.format(ip_regex), download, name="download"),
 ]

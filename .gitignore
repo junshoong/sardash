@@ -100,10 +100,11 @@ ENV/
 # mypy
 .mypy_cache/
 
-
 #db
 db.sqlite3
 
-
 #sar file
 sa/
+
+#jetbrain
+.idea/
