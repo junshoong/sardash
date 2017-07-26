@@ -60,6 +60,44 @@ def _get_sar_mem(ip):
 
     return row
 
+
+def _get_sar_paging(ip):
+    try:
+        if ip is None:
+            command = os.popen("sar -B")
+        else:
+            command = os.popen("sar -B -f /tmp/"+ip+"/sa"+TODAY)
+        raw_data = command.read().strip().split('\n')
+        data = dict()
+        data['info']= raw_data[0]
+        data['start'] = raw_data[2]
+        data['header'] = raw_data[4]
+        data['body'] = raw_data[5:-1]
+        data['avg'] = raw_data[-1]
+
+        row = []
+        for x in data['body']:
+            row.append(x.split())
+
+    except Exception as err:
+        data = str(err)
+
+    return row
+
+
+def get_sar_paging(request, ip=None):
+    try:
+        data = _get_sar_paging(ip)
+    except Exception:
+        data = None
+    data = json.dumps(data)
+    response = HttpResponse()
+    response['Content-Type'] = 'text/javascript'
+    response.write(data)
+
+    return response
+    
+
 def get_sar_mem(request, ip=None):
     try:
         data = _get_sar_mem(ip)

@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>{% block title %}SAR DASH{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
@@ -20,7 +22,7 @@
 
 </head>
 <body>
-    <div class="container">
+    <div class="container-fluid">
         <h1> SAR DASH </h1>
     {% block contents %}
     {% endblock %}

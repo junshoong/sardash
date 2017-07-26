@@ -1,10 +1,10 @@
-<svg class="mem" width="500" height="300"></svg>
+<svg class="paging" width="500" height="300"></svg>
 <script>
-var mem_svg = d3.select(".mem"),
+var paging_svg = d3.select(".paging"),
     margin = {top: 20, right: 20, bottom: 30, left: 50},
-    width = +mem_svg.attr("width") - margin.left - margin.right,
-    height = +mem_svg.attr("height") - margin.top - margin.bottom,
-    mem_g = mem_svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    width = +paging_svg.attr("width") - margin.left - margin.right,
+    height = +paging_svg.attr("height") - margin.top - margin.bottom,
+    paging_g = paging_svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var parseTime = d3.timeParse("%I:%M:%S%p");
 
@@ -18,7 +18,7 @@ var line = d3.line()
     .x(function(d, i) {return x(times[i]); })
     .y(y);
 
-d3.json("{% url 'get_sar_mem' %}{% if ip %}{{ ip }}/{% endif %}", function(error, data) {
+d3.json("{% url 'get_sar_paging' %}{% if ip %}{{ ip }}/{% endif %}", function(error, data) {
     
     data.forEach(function(d) {
         times.push(parseTime(d[0].concat(d[1])));
@@ -38,11 +38,11 @@ d3.json("{% url 'get_sar_mem' %}{% if ip %}{{ ip }}/{% endif %}", function(error
     y.domain([0,100]);
 
 
-  mem_g.append("g")
+  paging_g.append("g")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x));
 
-  mem_g.append("g")
+  paging_g.append("g")
       .call(d3.axisLeft(y))
       .append("text")
       .attr("fill", "#000")
@@ -51,7 +51,7 @@ d3.json("{% url 'get_sar_mem' %}{% if ip %}{{ ip }}/{% endif %}", function(error
       .attr("dy", "0.71em")
       .attr("text-anchor", "end")
 
-  var graph = mem_g.selectAll(".line")
+  var graph = paging_g.selectAll(".line")
       .data(values)
       .enter()
       .append("path")
