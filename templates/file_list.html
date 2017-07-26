@@ -2,7 +2,8 @@
 {% block contents %}
 <ul>
     {% for f in files %}
-    <li>{{ f }} </li>
+    {#<li><a href="{% url 'download' ip f %}">{{ f }}</li> #}
+        <li><a href="../{{f}}">{{ f }}</a></li>
     {% endfor %}
 </ul>
 {% endblock %}

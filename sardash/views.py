@@ -13,6 +13,8 @@ class HomeView(FormView):
         context = super(HomeView, self).get_context_data(*args, **kwargs)
         context['server'] = Server.objects.all()
         context['ip'] = self.request.get_full_path()[1:-1]
+        if context['ip'] is '':
+            context['ip'] = '127.0.0.1'
         return context
 
     def form_valid(self, form):

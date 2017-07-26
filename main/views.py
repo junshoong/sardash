@@ -4,11 +4,11 @@ import errno
 import subprocess
 from datetime import datetime
 
-from django.http import HttpResponse
 from django.shortcuts import render
 from django.shortcuts import render_to_response
-from django.utils.dateformat import DateFormat
 from django.http import HttpResponse
+from django.http import Http404
+from django.utils.dateformat import DateFormat
 
 from main.forms import IPForm
 from sardash.settings import SA_ROOT
@@ -88,7 +88,7 @@ def _get_sar_paging(ip):
     return row
 
 
-def get_sar_paging(request, ip=None):
+def get_sar_paging(request, ip='127.0.0.1'):
     try:
         data = _get_sar_paging(ip)
     except Exception:
@@ -101,7 +101,7 @@ def get_sar_paging(request, ip=None):
     return response
     
 
-def get_sar_mem(request, ip=None):
+def get_sar_mem(request, ip='127.0.0.1'):
     try:
         data = _get_sar_mem(ip)
     except Exception:
@@ -114,7 +114,7 @@ def get_sar_mem(request, ip=None):
     return response
     
 
-def get_sar_cpu(request, ip=None):
+def get_sar_cpu(request, ip='127.0.0.1'):
     try:
         data = _get_sar_cpu(ip)
     except Exception:
@@ -143,18 +143,17 @@ def get_remote_sar(ip):
         subprocess.run(['scp', 'root@'+ip+':/var/log/sa/sa'+TODAY,full_path])
     
 
-def download_sa(request, ip, file_name):
+def download(request, ip, file_name):
     file_path = os.path.join(SA_ROOT, ip, file_name)
     if os.path.exists(file_path):
         with open(file_path, 'rb') as f:
             response = HttpResponse(f.read(), content_type='application/octet-stream')
-            response['Content-Disposion'] = 'inline; filename='+ os.path.basename(file_path)
+            response['Content-Disposition'] = 'inline; filename='+ os.path.basename(file_path)
             return response
-
     raise Http404
 
 
-def file_list(request, ip=None):
+def file_list(request, ip='127.0.0.1'):
     if ip:
         files = os.listdir(SA_ROOT+ip)
     else:
