@@ -10,44 +10,58 @@ var parseTime = d3.timeParse("%I:%M:%S%p");
 
 var x = d3.scaleTime().rangeRound([0, width]);
 var y = d3.scaleLinear().rangeRound([height, 0]);
+var z = d3.scaleOrdinal(d3.schemeCategory10);
 
-var valueline = d3.line()
-    .x(function(d) {return x(d.date); })
-    .y(function(d) {return y(d.close); });
+var times = [];
+var line = d3.line()
+    .curve(d3.curveBasis)
+    .x(function(d, i) {return x(times[i]); })
+    .y(y);
 
 d3.json("{% url 'get_sar_cpu' %}{% if ip %}{{ ip }}/{% endif %}", function(error, data) {
+    
     data.forEach(function(d) {
-        d.date = parseTime(d[0].concat(d[1]));
-        d.close = +d[3];
+        times.push(parseTime(d[0].concat(d[1])));
     });
 
-    x.domain(d3.extent(data, function(d) { return d.date; }));
+    var values = data[0].map(function(col, i) {
+        return data.map(function(row) {
+            return row[i];
+        });
+    });
+    values.shift();
+    values.shift();
+    values.shift();
+    console.log(values);
+
+    x.domain(d3.extent(times));
     y.domain([0,100]);
 
 
   cpu_g.append("g")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x))
-    .select(".cpu .domain")
-      .remove();
+      .call(d3.axisBottom(x));
 
   cpu_g.append("g")
       .call(d3.axisLeft(y))
-    .append("text")
+      .append("text")
       .attr("fill", "#000")
       .attr("transform", "rotate(-90)")
       .attr("y", 6)
       .attr("dy", "0.71em")
       .attr("text-anchor", "end")
-      .text("user(%)");
 
-  cpu_g.append("path")
-      .datum(data)
+  var graph = cpu_g.selectAll(".line")
+      .data(values)
+      .enter()
+      .append("path")
       .attr("fill", "none")
-      .attr("stroke", "steelblue")
+      .attr("class", "line")
+      .attr("stroke", function(d, i) { return z(i); })
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
       .attr("stroke-width", 1.5)
-      .attr("d", valueline);
+      .attr("d", line);
 });
 </script>
+
