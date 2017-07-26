@@ -32,7 +32,6 @@ d3.json("{% url 'get_sar_cpu' %}{% if ip %}{{ ip }}/{% endif %}", function(error
     values.shift();
     values.shift();
     values.shift();
-    console.log(values);
 
     x.domain(d3.extent(times));
     y.domain([0,100]);

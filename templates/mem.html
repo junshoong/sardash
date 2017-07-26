@@ -1,16 +1,17 @@
 <svg class="mem" width="500" height="300"></svg>
 <script>
 var mem_svg = d3.select(".mem"),
-    margin = {top: 20, right: 20, bottom: 30, left: 50},
+    margin = {top: 20, right: 50, bottom: 30, left: 50},
     width = +mem_svg.attr("width") - margin.left - margin.right,
     height = +mem_svg.attr("height") - margin.top - margin.bottom,
     mem_g = mem_svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var parseTime = d3.timeParse("%I:%M:%S%p");
 
+var w = d3.scaleOrdinal(d3.schemeCategory10);
 var x = d3.scaleTime().rangeRound([0, width]);
 var y = d3.scaleLinear().rangeRound([height, 0]);
-var z = d3.scaleOrdinal(d3.schemeCategory10);
+var z = d3.scaleLinear().rangeRound([height, 0]);
 
 var times = [];
 var line = d3.line()
@@ -29,13 +30,20 @@ d3.json("{% url 'get_sar_mem' %}{% if ip %}{{ ip }}/{% endif %}", function(error
             return row[i];
         });
     });
-    values.shift();
-    values.shift();
-    values.shift();
-    console.log(values);
+    var values1 = [];
+    var values2 = [];
+    values.forEach(function(v, i) {
+        if (i == 0 || i == 1) {
+        } else if (i == 4 || i == 8) {
+            values1.push(v);
+        } else {
+            values2.push(v);
+        }
+    });
 
     x.domain(d3.extent(times));
     y.domain([0,100]);
+    z.domain([0,d3.max(values2, function(d) { return Math.max(d) })]);
 
 
   mem_g.append("g")
@@ -49,15 +57,35 @@ d3.json("{% url 'get_sar_mem' %}{% if ip %}{{ ip }}/{% endif %}", function(error
       .attr("transform", "rotate(-90)")
       .attr("y", 6)
       .attr("dy", "0.71em")
-      .attr("text-anchor", "end")
+      .attr("text-anchor", "end");
+
+    mem_g.append("g")
+        .call(d3.axisRight(z))
+        .attr("transform", "translate("+width+",0)")
+        .attr("fill", "#000")
+        .attr("text-anchor", "end")
+        .text("Value");
+ 
+  var graph = mem_g.selectAll(".line2")
+      .data(values2)
+      .enter()
+      .append("path")
+      .attr("fill", "none")
+      .attr("class", "line2")
+      .attr("stroke", function(d, i) { return w(i); })
+      .attr("stroke-linejoin", "round")
+      .attr("stroke-linecap", "round")
+      .attr("stroke-width", 1.5)
+      .attr("d", line);
+    
 
   var graph = mem_g.selectAll(".line")
-      .data(values)
+      .data(values1)
       .enter()
       .append("path")
       .attr("fill", "none")
       .attr("class", "line")
-      .attr("stroke", function(d, i) { return z(i); })
+      .attr("stroke", function(d, i) { return w(i); })
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
       .attr("stroke-width", 1.5)
